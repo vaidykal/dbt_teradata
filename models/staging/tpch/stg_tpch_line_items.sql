@@ -7,6 +7,14 @@ with source as (
 renamed as (
 
     select
+    /*
+        {{ dbt_utils.generate_surrogate_key(
+            ['l_orderkey', 
+            'l_linenumber']) }}
+        For the clearscape TD env, demo_user does not have CREATE FUNCTION permission on GLOBAL_FUNCTIONS database
+        Hence could not complete the instructions provided here for creating the surrogate_key macro:
+        https://github.com/Teradata/dbt-teradata-utils
+    */
         hash_md5(cast(coalesce(l_orderkey, '_dbt_utils_surrogate_key_null_') || '-' || coalesce(l_linenumber, '_dbt_utils_surrogate_key_null_') AS LONG VARCHAR))
                 as order_item_key,
         l_orderkey as order_key,

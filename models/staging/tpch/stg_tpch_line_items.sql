@@ -1,9 +1,16 @@
 with source as (
 
-    select * from {{ source('tpch', 'lineitem') }}
+    select top 100000 * from {{ source('tpch', 'lineitem') }}
 
 ),
+/*
+Had to grant following:
+grant execute function on demo_user to dbtdev_vkalpathy with grant option;
+grant select on demo_user to dbtdev_vkalpathy with grant option;
 
+Also had to create the hash_md5 function using bteq in demo_user and use it as below
+
+*/
 renamed as (
 
     select
@@ -15,16 +22,16 @@ renamed as (
         Hence could not complete the instructions provided here for creating the surrogate_key macro:
         https://github.com/Teradata/dbt-teradata-utils
     */
-        hash_md5(cast(coalesce(l_orderkey, '_dbt_utils_surrogate_key_null_') || '-' || coalesce(l_linenumber, '_dbt_utils_surrogate_key_null_') AS LONG VARCHAR))
+        cast(hash_md5(cast(coalesce(l_orderkey, '_dbt_utils_surrogate_key_null_') || '-' || coalesce(l_linenumber, '_dbt_utils_surrogate_key_null_') AS varchar(100))) as varchar(100))
                 as order_item_key,
         l_orderkey as order_key,
         l_partkey as part_key,
         l_suppkey as supplier_key,
         l_linenumber as line_number,
-        l_quantity as quantity,
-        l_extendedprice as extended_price,
-        l_discount as discount_percentage,
-        l_tax as tax_rate,
+        cast(l_quantity as bigint) as quantity,
+        cast(l_extendedprice as decimal(25,4)) as extended_price,
+        cast(l_discount as decimal(25,4)) as discount_percentage,
+        cast(l_tax as decimal(25,4)) as tax_rate,
         l_returnflag as return_flag,
         l_linestatus as status_code,
         l_shipdate as ship_date,

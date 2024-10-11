@@ -9,17 +9,15 @@
 
 {{ config(materialized='table') }}
 
-with source_data as (
-
+with source1 as (
     select 1 as id
-    union all
+),
+source2 as (
     select null as id
-
 )
-
-select *
-from source_data
-
+select id from source1
+union all
+select id from source2
 /*
     Uncomment the line below to remove records with null `id` values
 */
